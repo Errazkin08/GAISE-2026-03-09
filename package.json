@@ -1,0 +1,16 @@
+{
+  "name": "2026-03-9",
+  "version": "1.0.0",
+  "description": "Web app para aprender Mus con un enfoque herrikoia de Hernani",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

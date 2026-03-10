@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="eu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mus Ikasi – Hernaniko Estiloa</title>
+  <style>
+    :root {
+      --verde: #1a6b3a;
+      --verde-dark: #124a28;
+      --crema: #f5ecd7;
+      --naranja: #d97b2b;
+      --rojo: #b52b2b;
+      --gris: #3a3a3a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Georgia', serif;
+      background: var(--verde-dark);
+      color: var(--crema);
+      min-height: 100vh;
+    }
+    header {
+      background: var(--verde);
+      padding: 1.2rem 2rem;
+      display: flex; align-items: center; gap: 1rem;
+      border-bottom: 3px solid var(--naranja);
+    }
+    header h1 { font-size: 2rem; letter-spacing: 2px; }
+    header span { font-size: 0.9rem; opacity: 0.7; margin-top: 2px; display: block; }
+
+    nav {
+      background: #0e4522;
+      display: flex; flex-wrap: wrap; gap: 0;
+      border-bottom: 2px solid var(--naranja);
+    }
+    nav button {
+      background: none; border: none; color: var(--crema);
+      padding: 0.8rem 1.4rem; cursor: pointer; font-size: 0.95rem;
+      font-family: inherit; transition: background 0.2s;
+      border-right: 1px solid #1a6b3a44;
+    }
+    nav button:hover, nav button.active {
+      background: var(--naranja); color: white;
+    }
+
+    main { max-width: 960px; margin: 0 auto; padding: 2rem 1.5rem; }
+
+    .tab { display: none; }
+    .tab.active { display: block; }
+
+    h2 { font-size: 1.6rem; color: var(--naranja); margin-bottom: 1rem; border-bottom: 1px solid #ffffff22; padding-bottom: 0.4rem; }
+    h3 { font-size: 1.15rem; color: #f9d89a; margin: 1.2rem 0 0.4rem; }
+    p { line-height: 1.7; margin-bottom: 0.7rem; }
+    ul { margin-left: 1.4rem; margin-bottom: 0.7rem; line-height: 1.9; }
+    li strong { color: var(--naranja); }
+
+    .card-grid {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 1rem; margin: 1.2rem 0;
+    }
+    .card-item {
+      background: var(--verde); border: 2px solid var(--naranja);
+      border-radius: 8px; padding: 0.8rem;
+      text-align: center; font-size: 1.6rem;
+      cursor: default; user-select: none;
+    }
+    .card-item small { display: block; font-size: 0.75rem; margin-top: 4px; opacity: 0.8; }
+
+    .sena-grid {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 1rem; margin: 1rem 0;
+    }
+    @media (max-width: 600px) { .sena-grid { grid-template-columns: 1fr; } }
+    .sena-card {
+      background: var(--verde); border: 1px solid #ffffff22;
+      border-radius: 8px; padding: 1rem;
+    }
+    .sena-card h4 { color: var(--naranja); margin-bottom: 0.4rem; font-size: 1rem; }
+
+    .ronda-box {
+      background: var(--verde); border-left: 4px solid var(--naranja);
+      border-radius: 0 8px 8px 0; padding: 1rem 1.2rem; margin: 0.8rem 0;
+    }
+    .ronda-box .badge {
+      display: inline-block; background: var(--naranja); color: white;
+      border-radius: 4px; padding: 1px 8px; font-size: 0.8rem;
+      margin-bottom: 0.4rem;
+    }
+
+    /* Quiz */
+    .quiz-box { background: var(--verde); border-radius: 10px; padding: 1.5rem; }
+    .quiz-pregunta { font-size: 1.1rem; margin-bottom: 1rem; min-height: 2.5rem; }
+    .quiz-opciones { display: grid; grid-template-columns: 1fr 1fr; gap: 0.7rem; }
+    @media (max-width: 500px) { .quiz-opciones { grid-template-columns: 1fr; } }
+    .quiz-btn {
+      background: #0e4522; border: 2px solid #ffffff33;
+      color: var(--crema); padding: 0.7rem 1rem; border-radius: 7px;
+      cursor: pointer; font-size: 0.95rem; font-family: inherit;
+      text-align: left; transition: border-color 0.15s;
+    }
+    .quiz-btn:hover:not(:disabled) { border-color: var(--naranja); }
+    .quiz-btn.correct { background: #1a6b3a; border-color: #5add8a; color: #c8ffd4; }
+    .quiz-btn.wrong { background: #6b1a1a; border-color: #dd5a5a; color: #ffd4d4; }
+    .quiz-feedback {
+      margin-top: 1rem; padding: 0.7rem 1rem;
+      border-radius: 6px; font-size: 0.95rem; min-height: 1.5rem;
+    }
+    .quiz-feedback.ok { background: #1a6b2a44; border-left: 3px solid #5add8a; }
+    .quiz-feedback.ko { background: #6b1a1a44; border-left: 3px solid #dd5a5a; }
+    .quiz-footer { margin-top: 1rem; display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; }
+    .btn-next {
+      background: var(--naranja); color: white; border: none;
+      border-radius: 6px; padding: 0.6rem 1.4rem; cursor: pointer;
+      font-size: 0.95rem; font-family: inherit; display: none;
+    }
+    #quiz-score { font-size: 0.9rem; opacity: 0.8; }
+
+    /* Glosario */
+    .glosario-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    .glosario-table th { background: var(--naranja); color: white; padding: 0.5rem 0.8rem; text-align: left; }
+    .glosario-table td { padding: 0.5rem 0.8rem; border-bottom: 1px solid #ffffff11; }
+    .glosario-table tr:nth-child(even) td { background: #ffffff08; }
+
+    /* Simulator */
+    .mesa {
+      background: #145c30;
+      border: 3px solid #0a3d1e;
+      border-radius: 12px;
+      padding: 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      grid-template-rows: auto auto auto;
+      gap: 1rem;
+      align-items: center;
+      position: relative;
+    }
+    .jugador {
+      background: #0e4522;
+      border-radius: 8px;
+      padding: 0.8rem;
+      text-align: center;
+    }
+    .jugador .nombre { font-size: 0.8rem; opacity: 0.7; margin-bottom: 0.4rem; }
+    .jugador .mano { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+    .jugador-center { grid-column: 2; grid-row: 1 / 4; text-align: center; }
+    .jugador-arriba { grid-column: 2; grid-row: 1; }
+    .jugador-izq  { grid-column: 1; grid-row: 2; }
+    .jugador-der  { grid-column: 3; grid-row: 2; }
+    .jugador-abajo { grid-column: 2; grid-row: 3; }
+    .mazo-center {
+      grid-column: 2; grid-row: 2;
+      text-align: center; font-size: 0.9rem;
+    }
+
+    .carta-mini {
+      background: white; color: #222;
+      border-radius: 4px; padding: 2px 5px;
+      font-size: 0.8rem; font-weight: bold;
+      border: 1px solid #aaa; min-width: 28px;
+      text-align: center; line-height: 1.4;
+      cursor: default; user-select: none;
+    }
+    .carta-mini.palo-cop, .carta-mini.palo-ore { color: var(--rojo); }
+    .carta-mini.palo-bas, .carta-mini.palo-esp { color: #1a1a8c; }
+    .carta-mini.dorso {
+      background: var(--verde-dark); color: transparent;
+      border: 2px solid var(--naranja);
+    }
+
+    .marcador {
+      display: flex; justify-content: center; gap: 3rem;
+      background: #0e4522; border-radius: 8px; padding: 0.8rem 1.5rem;
+      margin: 1rem 0;
+    }
+    .marcador-equipo { text-align: center; }
+    .marcador-equipo .pts { font-size: 2rem; font-weight: bold; color: var(--naranja); }
+    .marcador-equipo .lbl { font-size: 0.75rem; opacity: 0.7; }
+
+    .fase-info {
+      background: #0e3d1e; border: 1px solid var(--naranja);
+      border-radius: 6px; padding: 0.6rem 1rem; text-align: center;
+      font-size: 0.9rem; margin-bottom: 1rem;
+    }
+    .sim-actions { display: flex; gap: 0.7rem; flex-wrap: wrap; margin-top: 1rem; }
+    .sim-btn {
+      background: var(--verde); border: 2px solid #ffffff33;
+      color: var(--crema); padding: 0.5rem 1.1rem; border-radius: 6px;
+      cursor: pointer; font-family: inherit; font-size: 0.9rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .sim-btn:hover { background: var(--naranja); border-color: var(--naranja); color: white; }
+    .sim-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .sim-btn.primary { background: var(--naranja); border-color: var(--naranja); color: white; }
+    .sim-log {
+      background: #000a04cc; border-radius: 6px;
+      padding: 0.7rem 1rem; margin-top: 0.8rem;
+      font-size: 0.85rem; line-height: 1.8;
+      max-height: 160px; overflow-y: auto;
+      font-family: monospace;
+    }
+    .sim-log .log-entry { padding: 1px 0; }
+    .sim-log .log-entry.system { color: #f9d89a; }
+    .sim-log .log-entry.action { color: #a8f0b8; }
+    .sim-log .log-entry.win    { color: #ffd97b; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>🃏 MUS IKASI</h1>
+    <span>Hernaniko estiloa – Aprende a jugar al Mus como en Hernani</span>
+  </div>
+</header>
+
+<nav id="main-nav">
+  <button class="active" data-tab="intro">Sarrera</button>
+  <button data-tab="cartas">Kartak</button>
+  <button data-tab="rondas">Rondat</button>
+  <button data-tab="senas">Señak</button>
+  <button data-tab="simulador">Simulagailua</button>
+  <button data-tab="quiz">Quiz</button>
+  <button data-tab="glosario">Hiztegia</button>
+</nav>
+
+<main>
+
+  <!-- ===== SARRERA ===== -->
+  <section class="tab active" id="tab-intro">
+    <h2>Zer da Musa?</h2>
+    <p>Musa joko bat da, Euskal Herriko ohikoena. Hernanin —bezala inguruko herri guztietan— ez da soilik joko bat: <strong>adiskidetasunaren, kementasunaren eta maltzurkeriaren arteko oreka bat da</strong>.</p>
+    <p>4 jokalari aritzen dira (2 bikote), 40 kartako Espainiako baraiari eginda. Helburua: <strong>40 tanto lortu</strong> (bat eta berrogei jokatzean) eta hori aurretik lortu duen bikotea irabazle.</p>
+
+    <h3>Hernaniko kutsu berezia</h3>
+    <ul>
+      <li><strong>Berba gutxi, seinale asko:</strong> Hernaniarrek ohikoa dute bikotekideari señaz hitz egitea hitzik esan gabe. Isilpeko komunikazioa funtsezkoa da.</li>
+      <li><strong>"Mus!" ozen eta berehala:</strong> Hernanin ez dira batere motelak muserako eskatzean. Eman behar ez duzun karitateak zure karta ona erakusten du.</li>
+      <li><strong>Ordago sinesgarria:</strong> Aguante egitea baino gehiago, ordagoak beldurra sartzeko erabiltzen dira —baduzu ala ez duzu—.</li>
+      <li><strong>Txikia ez ahaztu:</strong> Grande baino txikia askotan gehiago baloratzen da eskualdean.</li>
+    </ul>
+
+    <h3>Jokoa laburki</h3>
+    <ul>
+      <li>4 karta banatzen zaizkio jokalariari.</li>
+      <li><strong>Mus fasea:</strong> Nahi dituzun kartak aldatu ditzakezu. Jokalari batek "hordago" esaten badu, karta aldaketa gelditzen da.</li>
+      <li>Ondoren 4 ronda jokatzen dira: <strong>Grande, Txikia, Pariak, Jokoa</strong> (edo Puntua).</li>
+      <li>Ronda bakoitzean apostuak egin daitezke: paso, enbidoa, eta ordagoa.</li>
+    </ul>
+  </section>
+
+  <!-- ===== KARTAK ===== -->
+  <section class="tab" id="tab-cartas">
+    <h2>Museko Kartak</h2>
+    <p>Musean 40 kartako Espainiako baraia erabiltzen da, baina kontaketa berezia du. Kartetan <strong>figurarik eta 8, 9 kopiarik</strong> ez daude —haiek deuseztatu egiten dira kontaketan—.</p>
+
+    <h3>Karteen balioa Musean</h3>
+    <div class="card-grid" id="valor-grid"></div>
+
+    <h3>Palo-ak</h3>
+    <div class="card-grid">
+      <div class="card-item">🏆<br/><small>Oros</small></div>
+      <div class="card-item" style="color:#c8d8ff">⚔️<br/><small>Espadas</small></div>
+      <div class="card-item">🏑<br/><small>Bastos</small></div>
+      <div class="card-item">🏺<br/><small>Copas</small></div>
+    </div>
+
+    <h3>Kartak Grande-erako (handienak lehenengo)</h3>
+    <p>Errege (K) &gt; Kaballo (Q) &gt; Sota (J) &gt; 7 &gt; 6 &gt; 5 &gt; 4 &gt; 3 &gt; 2 &gt; As</p>
+
+    <h3>Kartak Txikia-rako (txikienak lehenengo)</h3>
+    <p>As &gt; 2 &gt; 3 &gt; 4 &gt; 5 &gt; 6 &gt; 7 &gt; Sota &gt; Kaballo &gt; Errege</p>
+
+    <h3>Jokorako balioa (puntuak)</h3>
+    <ul>
+      <li><strong>Errege, Kaballo, Sota, As:</strong> 10 puntu bakoitza</li>
+      <li><strong>2–7:</strong> bere zenbakizko balioa (7 = 7 puntu, eta abar)</li>
+    </ul>
+    <p>Jokoa izateko eskuan <strong>31 puntu edo gehiago</strong> behar dira.</p>
+  </section>
+
+  <!-- ===== RONDAK ===== -->
+  <section class="tab" id="tab-rondas">
+    <h2>Lau Rondat</h2>
+
+    <div class="ronda-box">
+      <span class="badge">1. Ronda</span>
+      <h3>GRANDE (Handia)</h3>
+      <p>Nork dauka kartan handienak? Eskuak konparatzen dira karta handiena duena lehenengo. Errege-erregeak badaude, oros-errege &gt; espadas-errege &gt; bastos-errege &gt; copas-errege.</p>
+      <ul>
+        <li><strong>Paso:</strong> ez duzu enbidatzen, bestea enbida dezan itxaroteko.</li>
+        <li><strong>Enbido:</strong> tantoetarako erronka egiten duzu (normalean 2 tanto).</li>
+        <li><strong>Ordago:</strong> dena arriskuan jartzen duzu – partida osoa!</li>
+      </ul>
+    </div>
+
+    <div class="ronda-box">
+      <span class="badge">2. Ronda</span>
+      <h3>TXIKIA (Chica)</h3>
+      <p>Nork dauka kartan txikienak? Asa karta txikiena da. As-as-as-2 eskua imbatiblea da (Hernanin horri <em>"txikiena"</em> esaten zaio harrotasunez).</p>
+    </div>
+
+    <div class="ronda-box">
+      <span class="badge">3. Ronda</span>
+      <h3>PARIAK</h3>
+      <p>Karta berdinak dituzu? Pareen sistemak:
+      <ul>
+        <li><strong>Pare bat (Pareja):</strong> kartako bi berdin.</li>
+        <li><strong>Medias:</strong> hirukoa (3 karta berdin).</li>
+        <li><strong>Duples:</strong> bi pare ezberdin.</li>
+      </ul>
+      Medias &gt; Duples &gt; Pare bat, eta balio berdinetarako karta handiena nagusitzen da.</p>
+    </div>
+
+    <div class="ronda-box">
+      <span class="badge">4. Ronda</span>
+      <h3>JOKOA / PUNTUA</h3>
+      <p><strong>Jokoa</strong> izateko 31 puntu edo gehiago behar dituzu. Jokorik inork ez badu, <strong>Puntua</strong> jokatzen da (31ra hurbilena irabazten du).</p>
+      <ul>
+        <li><strong>31 puntuko eskua:</strong> joko onena.</li>
+        <li><strong>32, 40, 37, 36…</strong> hurrenez hurreneko ordena.</li>
+        <li>Jokoa: irabazleak 2 tanto; Puntua: 1 tanto.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ===== SEÑAK ===== -->
+  <section class="tab" id="tab-senas">
+    <h2>Señak – Seinale sekretuak</h2>
+    <p>Señak dira musaren bihotza. Bikotekideari esan behar diozu zer duzun eskuan, <strong>arerioak konturatu gabe</strong>. Hernaniko tabernan ikasitakoak hauek dira:</p>
+
+    <div class="sena-grid" id="sena-grid"></div>
+
+    <h3>Kontuz!</h3>
+    <ul>
+      <li>Señak ez dira beti berdinak jokalari guztiengan – bikoteak bere señak adostu behar ditu partida hasi aurretik.</li>
+      <li>Señarik ez egitea ere salatzen du (ez dakazula deus).</li>
+      <li>Hernaniarrek ohikoa dute gezurrezko señak egitea areria nahasteko (<em>"burua mugitu"</em>: ez du ezer esan nahi bere buruaz).</li>
+    </ul>
+  </section>
+
+  <!-- ===== SIMULAGAILUA ===== -->
+  <section class="tab" id="tab-simulador">
+    <h2>Museko Simulagailua</h2>
+    <p>Lau jokalaritako partida sinplifikatua. <strong>Zu</strong> (behean) jokalariak kartak ikusten ditu; besteak automatikoki jokatzen dute. Apustu fase bakoitzean aukerako boto soila simulatzen da.</p>
+
+    <div class="marcador">
+      <div class="marcador-equipo">
+        <div class="pts" id="pts-a">0</div>
+        <div class="lbl">Zu + Goi (A)</div>
+      </div>
+      <div style="font-size:1.5rem;opacity:0.4">vs</div>
+      <div class="marcador-equipo">
+        <div class="pts" id="pts-b">0</div>
+        <div class="lbl">Esk + Esk (B)</div>
+      </div>
+    </div>
+
+    <div class="fase-info" id="fase-info">Sakatu "Partida berria" hasteko</div>
+
+    <div class="mesa" id="mesa">
+      <div class="jugador jugador-arriba">
+        <div class="nombre">Goi (bikotekidea)</div>
+        <div class="mano" id="mano-top"></div>
+      </div>
+      <div class="jugador jugador-izq">
+        <div class="nombre">Ezker</div>
+        <div class="mano" id="mano-left"></div>
+      </div>
+      <div class="mazo-center" id="mazo-center">🂠</div>
+      <div class="jugador jugador-der">
+        <div class="nombre">Eskuin</div>
+        <div class="mano" id="mano-right"></div>
+      </div>
+      <div class="jugador jugador-abajo">
+        <div class="nombre">Zu ⭐</div>
+        <div class="mano" id="mano-bottom"></div>
+      </div>
+    </div>
+
+    <div class="sim-actions">
+      <button class="sim-btn primary" id="btn-new-game">Partida berria</button>
+      <button class="sim-btn" id="btn-next-round" disabled>Hurrengo ronda</button>
+      <button class="sim-btn" id="btn-auto-play" disabled>Auto-jokatu</button>
+    </div>
+
+    <div class="sim-log" id="sim-log"></div>
+  </section>
+
+  <!-- ===== QUIZ ===== -->
+  <section class="tab" id="tab-quiz">
+    <h2>Proba ezazu – Quiz</h2>
+    <div class="quiz-box">
+      <div class="quiz-pregunta" id="quiz-pregunta">Kargatu...</div>
+      <div class="quiz-opciones" id="quiz-opciones"></div>
+      <div class="quiz-feedback" id="quiz-feedback"></div>
+      <div class="quiz-footer">
+        <button class="btn-next" id="btn-next-quiz">Hurrengo &rarr;</button>
+        <span id="quiz-score"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== GLOSARIOA ===== -->
+  <section class="tab" id="tab-glosario">
+    <h2>Hiztegia (Glosario)</h2>
+    <table class="glosario-table">
+      <thead><tr><th>Terminoa</th><th>Gaztelaniaz</th><th>Azalpena</th></tr></thead>
+      <tbody id="glosario-tbody"></tbody>
+    </table>
+  </section>
+
+</main>
+
+<script>
+// ─── NAV ───────────────────────────────────────────────────────────────────
+document.querySelectorAll('#main-nav button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('#main-nav button').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// ─── DATOS ────────────────────────────────────────────────────────────────
+const PALOS = ['ore','esp','bas','cop'];
+const PALO_SYM = { ore:'🏆', esp:'⚔️', bas:'🏑', cop:'🏺' };
+const VALORES = [
+  { num: 1, nombre: 'As',     valor: 10, grande: 1  },
+  { num: 2, nombre: 'Dos',    valor: 2,  grande: 2  },
+  { num: 3, nombre: 'Tres',   valor: 3,  grande: 3  },
+  { num: 4, nombre: 'Cuatro', valor: 4,  grande: 4  },
+  { num: 5, nombre: 'Cinco',  valor: 5,  grande: 5  },
+  { num: 6, nombre: 'Seis',   valor: 6,  grande: 6  },
+  { num: 7, nombre: 'Siete',  valor: 7,  grande: 7  },
+  { num: 10, nombre: 'Sota',  valor: 10, grande: 8  },
+  { num: 11, nombre: 'Kabo',  valor: 10, grande: 9  },
+  { num: 12, nombre: 'Errege',valor: 10, grande: 10 },
+];
+
+// Render valor grid
+const valorGrid = document.getElementById('valor-grid');
+VALORES.forEach(v => {
+  const d = document.createElement('div');
+  d.className = 'card-item';
+  d.innerHTML = `${v.nombre}<small>${v.valor} puntu / Rango: ${v.grande}</small>`;
+  valorGrid.appendChild(d);
+});
+
+// Señas
+const SENAS = [
+  { nombre: 'Errege pare bat',     sena: 'Ezpainen azpian mingaina sartu',    ronda: 'Grande / Pariak' },
+  { nombre: 'As pare bat',         sena: 'Sudurra kilikatu',                  ronda: 'Txikia / Pariak' },
+  { nombre: 'Medias (hirukoa)',     sena: 'Begiak itxi eta ireki',             ronda: 'Pariak'          },
+  { nombre: 'Duples (bi pare)',     sena: 'Ezpainak zertxobait mugitu',        ronda: 'Pariak'          },
+  { nombre: 'Jokoa daukat',        sena: 'Bekaina altxatu',                   ronda: 'Jokoa'           },
+  { nombre: '31 puntu exactu',     sena: 'Mihia erakutsi',                    ronda: 'Jokoa'           },
+  { nombre: 'Grande handia',       sena: 'Burua pixka bat okertu eskuinera',  ronda: 'Grande'          },
+  { nombre: 'Txikia txikia',       sena: 'Bekaina jaitsi',                    ronda: 'Txikia'          },
+  { nombre: 'Ordago egin',        sena: 'Mahai-kolpe txiki bat (herrikoia)',  ronda: 'Edozein'         },
+  { nombre: 'Ez daukat deus',      sena: 'Señarik ez egitea',                 ronda: 'Edozein'         },
+];
+const senaGrid = document.getElementById('sena-grid');
+SENAS.forEach(s => {
+  const d = document.createElement('div');
+  d.className = 'sena-card';
+  d.innerHTML = `<h4>${s.nombre}</h4><p><strong>Señalea:</strong> ${s.sena}</p><p><small>Ronda: ${s.ronda}</small></p>`;
+  senaGrid.appendChild(d);
+});
+
+// Glosario
+const GLOSARIO = [
+  ['Mus',       'Mus (pasa/cambia)',   'Kartarik aldatu nahi duzula adierazi; balio du zuek biek osatzen duzuenean.'],
+  ['Hordago',   'Paso/Corte',          '"Ez musrik" esan nahi du – karta aldaketa gelditzen da.'],
+  ['Enbido',    'Envido',              'Ronda batean apustua egin: 2 tanto arriskuan jartzen dituzu.'],
+  ['Ordago',    'Órdago',              'Partida osoa apustu: irabazten baduzu dena, galtzen baduzu bestea.'],
+  ['Paso',      'Paso',                'Ez enbidatu; bestea mintzatzera gonbidatzen duzu.'],
+  ['Quiero',    'Quiero',              'Onartzen duzu apustua.'],
+  ['No quiero', 'No quiero / Paso',    'Ukatu apustua (besteak punto bat irabazten du).'],
+  ['Grande',    'Grande',              '1. ronda: karta handienak.'],
+  ['Txikia',    'Chica',               '2. ronda: karta txikienak.'],
+  ['Pariak',    'Pares',               '3. ronda: bikoteak, hirukoak, eta bi-bikoteak.'],
+  ['Jokoa',     'Juego',               '4. ronda: 31 puntu edo gehiago eskuan.'],
+  ['Puntua',    'Punto',               '4. tarterako, jokorik inork ez duenean, 31koa hurbilena.'],
+  ['Medias',    'Medias (trío)',        'Hiru karta berdin eskuan.'],
+  ['Duples',    'Duples (doble pareja)','Bi pare ezberdin eskuan.'],
+  ['Amusteko',  'Sin mus',             'Beste taldearen batek hordago esan du; musik gabe jarraitu.'],
+  ['Tanto',     'Tanto',               'Puntua; 40 tanto behar dira irabazi.'],
+  ['Marka',     'Señal',               'Seinale isila bikotekideari informazioa helarazteko.'],
+];
+const tbody = document.getElementById('glosario-tbody');
+GLOSARIO.forEach(([t, es, az]) => {
+  const tr = document.createElement('tr');
+  tr.innerHTML = `<td><strong>${t}</strong></td><td>${es}</td><td>${az}</td>`;
+  tbody.appendChild(tr);
+});
+
+// ─── QUIZ ─────────────────────────────────────────────────────────────────
+const PREGUNTAS = [
+  { p: 'Zenbat karta ematen zaizkio jokalari bakoitzari Musean?', ops: ['3', '4', '5', '2'], ok: 1 },
+  { p: 'Zer da "ordago"?', ops: ['Karta aldaketa', 'Apustu txikia', 'Partida osoa jokatzen da', 'Pasa'], ok: 2 },
+  { p: 'Zenbat tanto behar dira irabazi?', ops: ['20', '30', '40', '50'], ok: 2 },
+  { p: 'Zein da kartan txikiena Musean?', ops: ['Bi', 'Errege', 'As', 'Sota'], ok: 2 },
+  { p: '"Medias" zer da?', ops: ['Bi pare', 'Hiru karta berdin', 'Lau karta berdin', 'Pare bat handi'], ok: 1 },
+  { p: 'Zenbat puntu balio du Erregeak jokorako?', ops: ['5', '7', '10', '12'], ok: 2 },
+  { p: 'Grande rondak zer bilatzen du?', ops: ['Karta txikienak', 'Karta handienak', 'Pareak', 'Jokoa'], ok: 1 },
+  { p: '"Jokoa" izateko gutxienez zenbat puntu behar dituzu?', ops: ['25', '28', '31', '35'], ok: 2 },
+  { p: 'Zer esan nahi du "hordago" edo "corte"?', ops: ['Enbido gehiago', 'Musik ez – karta aldaketa gelditu', 'Paso', 'Quiero'], ok: 1 },
+  { p: 'Zer da "Txikia" ronda?', ops: ['Karta handienak konparatu', 'Karta txikienak konparatu', 'Pareak konparatu', 'Puntuak konparatu'], ok: 1 },
+  { p: '"Duples" zer da?', ops: ['Hirukoa', 'Laukoa', 'Bi pare ezberdin', 'Pare handi bat'], ok: 2 },
+  { p: 'Noiz jokatzen da "Puntua" Jokoaren ordez?', ops: ['Beti', 'Inork ez duenean 31 puntu', 'As-ak daudenean', 'Errege-ak daudenean'], ok: 1 },
+];
+
+let qIdx = 0, qCorrect = 0, qTotal = 0, qAnswered = false;
+const qShuffled = [...PREGUNTAS].sort(() => Math.random() - 0.5);
+
+function loadQuestion() {
+  const q = qShuffled[qIdx % qShuffled.length];
+  document.getElementById('quiz-pregunta').textContent = q.p;
+  const cont = document.getElementById('quiz-opciones');
+  cont.innerHTML = '';
+  const idxs = [...Array(q.ops.length).keys()].sort(() => Math.random() - 0.5);
+  const correctOp = q.ops[q.ok];
+  idxs.forEach(i => {
+    const b = document.createElement('button');
+    b.className = 'quiz-btn';
+    b.textContent = q.ops[i];
+    b.addEventListener('click', () => {
+      if (qAnswered) return;
+      qAnswered = true; qTotal++;
+      const fb = document.getElementById('quiz-feedback');
+      if (q.ops[i] === correctOp) {
+        qCorrect++;
+        b.classList.add('correct');
+        fb.textContent = '✓ Zuzen! ' + (q.explanation || '');
+        fb.className = 'quiz-feedback ok';
+      } else {
+        b.classList.add('wrong');
+        cont.querySelectorAll('.quiz-btn').forEach(bb => { if (bb.textContent === correctOp) bb.classList.add('correct'); });
+        fb.textContent = '✗ Ez. Erantzun zuzena: ' + correctOp;
+        fb.className = 'quiz-feedback ko';
+      }
+      document.getElementById('btn-next-quiz').style.display = 'inline-block';
+      document.getElementById('quiz-score').textContent = `${qCorrect} / ${qTotal} zuzen`;
+    });
+    cont.appendChild(b);
+  });
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-feedback').className = 'quiz-feedback';
+  document.getElementById('btn-next-quiz').style.display = 'none';
+  qAnswered = false;
+}
+document.getElementById('btn-next-quiz').addEventListener('click', () => { qIdx++; loadQuestion(); });
+loadQuestion();
+
+// ─── SIMULAGAILUA ─────────────────────────────────────────────────────────
+const CARD_LABELS = { 1:'A', 2:'2', 3:'3', 4:'4', 5:'5', 6:'6', 7:'7', 10:'J', 11:'Q', 12:'K' };
+const PALO_CLASS  = { ore:'palo-ore', esp:'palo-esp', bas:'palo-bas', cop:'palo-cop' };
+const FASES = ['Grande', 'Txikia', 'Pariak', 'Jokoa'];
+
+let state = {
+  hands: [[],[],[],[]],   // 0=bottom(you), 1=top, 2=left, 3=right
+  ptsA: 0, ptsB: 0,
+  faseIdx: 0,
+  log: []
+};
+
+function buildDeck() {
+  const deck = [];
+  PALOS.forEach(p => VALORES.forEach(v => deck.push({ num: v.num, palo: p, valor: v.valor, grande: v.grande, nombre: v.nombre })));
+  return deck.sort(() => Math.random() - 0.5);
+}
+
+function deal() {
+  const deck = buildDeck();
+  return [
+    deck.slice(0,4), deck.slice(4,8), deck.slice(8,12), deck.slice(12,16)
+  ];
+}
+
+function cardEl(card, hidden=false) {
+  const d = document.createElement('span');
+  if (hidden) { d.className = 'carta-mini dorso'; d.textContent = '▪'; }
+  else {
+    const sym = PALO_SYM[card.palo] || '';
+    d.className = `carta-mini ${PALO_CLASS[card.palo]}`;
+    d.title = `${card.nombre} de ${card.palo}`;
+    d.textContent = `${CARD_LABELS[card.num]}${sym}`;
+  }
+  return d;
+}
+
+function renderManos() {
+  const ids = ['mano-bottom','mano-top','mano-left','mano-right'];
+  ids.forEach((id, i) => {
+    const cont = document.getElementById(id);
+    cont.innerHTML = '';
+    state.hands[i].forEach(c => cont.appendChild(cardEl(c, i !== 0)));
+  });
+}
+
+function addLog(msg, type='system') {
+  state.log.push({ msg, type });
+  const log = document.getElementById('sim-log');
+  const d = document.createElement('div');
+  d.className = `log-entry ${type}`;
+  d.textContent = msg;
+  log.appendChild(d);
+  log.scrollTop = log.scrollHeight;
+}
+
+function handGrandeScore(hand) { return Math.max(...hand.map(c => c.grande)); }
+function handTxikiaScore(hand) { return Math.min(...hand.map(c => c.grande)); }
+function handJuegoScore(hand) {
+  return hand.reduce((s,c) => s + c.valor, 0);
+}
+function hasPares(hand) {
+  const cnt = {};
+  hand.forEach(c => { cnt[c.num] = (cnt[c.num]||0)+1; });
+  const vals = Object.values(cnt);
+  if (vals.includes(3)) return 'medias';
+  if (vals.filter(v=>v>=2).length >= 2) return 'duples';
+  if (vals.includes(2)) return 'pareja';
+  return null;
+}
+
+function simulateBetting(teamAScore, teamBScore, fase) {
+  // Very simple: team with better score bids, other team calls or folds
+  const diff = teamAScore - teamBScore;
+  const TANTO = fase === 'Jokoa' ? 2 : 1;
+  if (diff === 0) { addLog(`${fase}: Berdinketa – tantori ez.`, 'system'); return [0,0]; }
+  if (diff > 0) {
+    addLog(`${fase}: A bikotea irabazi (enbido/paso) – ${TANTO} tanto.`, 'action');
+    return [TANTO, 0];
+  } else {
+    addLog(`${fase}: B bikotea irabazi (enbido/paso) – ${TANTO} tanto.`, 'action');
+    return [0, TANTO];
+  }
+}
+
+function playRound() {
+  if (state.faseIdx >= FASES.length) {
+    addLog('── Mano bukaera ──', 'system');
+    document.getElementById('btn-next-round').disabled = true;
+    document.getElementById('btn-auto-play').disabled = true;
+    checkGameEnd();
+    return;
+  }
+  const fase = FASES[state.faseIdx];
+  document.getElementById('fase-info').textContent = `Fase: ${fase}`;
+  addLog(`=== ${fase.toUpperCase()} ===`, 'system');
+
+  const [h0, h1, h2, h3] = state.hands;
+  const teamA0 = h0, teamA1 = h1, teamB0 = h2, teamB1 = h3;
+
+  let scoreA, scoreB;
+  if (fase === 'Grande') {
+    scoreA = Math.max(handGrandeScore(teamA0), handGrandeScore(teamA1));
+    scoreB = Math.max(handGrandeScore(teamB0), handGrandeScore(teamB1));
+  } else if (fase === 'Txikia') {
+    scoreA = Math.min(handTxikiaScore(teamA0), handTxikiaScore(teamA1));
+    scoreB = Math.min(handTxikiaScore(teamB0), handTxikiaScore(teamB1));
+    // For txikia, lower is better — invert for comparison
+    [scoreA, scoreB] = [-scoreA, -scoreB];
+  } else if (fase === 'Pariak') {
+    const rankPares = p => p === 'medias' ? 3 : p === 'duples' ? 2 : p === 'pareja' ? 1 : 0;
+    const pA = Math.max(rankPares(hasPares(teamA0)), rankPares(hasPares(teamA1)));
+    const pB = Math.max(rankPares(hasPares(teamB0)), rankPares(hasPares(teamB1)));
+    if (pA === 0 && pB === 0) { addLog('Pariak: inork ez – paso.', 'system'); state.faseIdx++; return; }
+    scoreA = pA; scoreB = pB;
+  } else { // Jokoa
+    const jA0 = handJuegoScore(teamA0), jA1 = handJuegoScore(teamA1);
+    const jB0 = handJuegoScore(teamB0), jB1 = handJuegoScore(teamB1);
+    const hasJuegoA = Math.max(jA0,jA1) >= 31;
+    const hasJuegoB = Math.max(jB0,jB1) >= 31;
+    if (!hasJuegoA && !hasJuegoB) {
+      // Punto: closest to 31 wins
+      const pA = Math.max(jA0,jA1), pB = Math.max(jB0,jB1);
+      addLog(`Puntua: A=${pA} B=${pB}`, 'system');
+      const [da, db] = pA >= pB ? [1,0] : [0,1];
+      state.ptsA += da; state.ptsB += db;
+      addLog(`Puntua: ${pA>=pB?'A':'B'} irabazi – 1 tanto.`, 'action');
+      state.faseIdx++;
+      updateScore();
+      return;
+    }
+    scoreA = hasJuegoA ? Math.max(jA0,jA1) : 0;
+    scoreB = hasJuegoB ? Math.max(jB0,jB1) : 0;
+  }
+
+  const [da, db] = simulateBetting(scoreA, scoreB, fase);
+  state.ptsA += da; state.ptsB += db;
+  state.faseIdx++;
+  updateScore();
+}
+
+function updateScore() {
+  document.getElementById('pts-a').textContent = state.ptsA;
+  document.getElementById('pts-b').textContent = state.ptsB;
+}
+
+function checkGameEnd() {
+  if (state.ptsA >= 40) {
+    addLog('🏆 A BIKOTEA IRABAZI! (Zu + Goi)', 'win');
+    document.getElementById('fase-info').textContent = '🏆 A bikotea irabazi!';
+  } else if (state.ptsB >= 40) {
+    addLog('🏆 B BIKOTEA IRABAZI! (Ezker + Eskuin)', 'win');
+    document.getElementById('fase-info').textContent = '🏴 B bikotea irabazi.';
+  }
+}
+
+function startNewGame() {
+  state.hands = deal();
+  state.faseIdx = 0;
+  document.getElementById('sim-log').innerHTML = '';
+  state.log = [];
+  renderManos();
+  document.getElementById('btn-next-round').disabled = false;
+  document.getElementById('btn-auto-play').disabled = false;
+  document.getElementById('fase-info').textContent = 'Mano berria – Grande hastera!';
+  addLog('Kartak banatuta. Grande-rekin hasten da.', 'system');
+  addLog(`Zure eskua: ${state.hands[0].map(c => CARD_LABELS[c.num] + PALO_SYM[c.palo]).join(' ')}`, 'action');
+  updateScore();
+}
+
+document.getElementById('btn-new-game').addEventListener('click', startNewGame);
+document.getElementById('btn-next-round').addEventListener('click', playRound);
+document.getElementById('btn-auto-play').addEventListener('click', () => {
+  while (state.faseIdx < FASES.length) playRound();
+  checkGameEnd();
+  document.getElementById('btn-next-round').disabled = true;
+  document.getElementById('btn-auto-play').disabled = true;
+});
+</script>
+</body>
+</html>
